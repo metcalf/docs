@@ -5,11 +5,28 @@
 {{#if productToken}}
                 <tr><td class="apiHelperProductSelectorLabel">Product Access Token</td><td><input type="text" size="50" class="apiHelperAuthSettingsProductAccessToken" value=""></td><td>&nbsp;</td></tr>
 {{/if}}
+{{#if productOrMyToken}}
+                <tr><td class="apiHelperProductSelectorLabel">Product Access Token</td>
+                    <td><input type="radio" class="apiHelperManualToken" checked>
+                        <span class="apiHelperManualLabel" style="display:none">Manually entered token</span>
+                        <input type="text" size="50" class="apiHelperAuthSettingsProductAccessToken" value=""> &nbsp;
+                        <label><input type="radio" class="apiHelperMyToken">My Token</label></td>
+                    <td>&nbsp;</td></tr>
+{{/if}}
 {{#if customerToken}}
                 <tr><td class="apiHelperProductSelectorLabel">Customer Access Token</td><td><input type="text" size="50" class="apiHelperAuthSettingsCustomerAccessToken" value=""></td><td>&nbsp;</td></tr>
 {{/if}}
 {{#if productId}}
                 <tr><td class="apiHelperProductSelectorLabel">Product ID</td><td><input type="text" size="10" class="apiHelperAuthSettingsProduct" value=""></td><td>&nbsp;</td></tr>
+{{/if}}
+{{#if productIdOrSandbox}}
+                <tr><td class="apiHelperProductSelectorLabel">Product ID</td>
+                    <td><input type="radio" class="apiHelperManualProductId" checked>
+                        <span class="apiHelperManualProductIdLabel" style="display:none">Manually entered Product ID</span>
+                        <input type="text" size="10" class="apiHelperAuthSettingsProduct" value=""> &nbsp;
+                        <label><input type="radio" class="apiHelperSandboxProductIdRadio">Sandbox Product</label>
+                        <select class="apiHelperSelect apiHelperSandboxProductIdSelect"></select></td>
+                    <td>&nbsp;</td></tr>
 {{/if}}
 {{#if deviceIdField}}
                 <tr><td class="apiHelperProductSelectorLabel">Device ID</td><td><input type="text" size="30" class="apiHelperDeviceLookupDeviceId" value=""></td><td class="apiHelperProductSelectorLabel"></td></tr>

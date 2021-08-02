@@ -201,6 +201,91 @@ $(document).ready(function () {
         });
     }
 
+    const setupCommonOptions = function(thisElem) {
+        if ($(thisElem).find('.apiHelperManualToken').length) {
+            const manualTokenRadioElem = $(thisElem).find('.apiHelperManualToken');
+            const manualTokenLabelElem = $(thisElem).find('.apiHelperManualLabel');
+            const myTokenRadioElem = $(thisElem).find('.apiHelperMyToken');
+            const manualTokenFieldElem = $(thisElem).find('.apiHelperAuthSettingsProductAccessToken');
+
+            $(manualTokenRadioElem).on('click', function() {
+                $(thisElem).find('.apiHelperAuthSettingsProductAccessToken').show();
+                $(manualTokenFieldElem).show();
+                $(manualTokenLabelElem).hide();
+                $(myTokenRadioElem).prop('checked', false);
+            });
+            $(manualTokenLabelElem).on('click', function() {
+                $(thisElem).find('.apiHelperAuthSettingsProductAccessToken').show();
+                $(manualTokenFieldElem).show();
+                $(manualTokenLabelElem).hide();
+                $(manualTokenRadioElem).prop('checked', true);
+                $(myTokenRadioElem).prop('checked', false);
+            });
+
+            $(myTokenRadioElem).on('click', function() {
+                $(thisElem).find('.apiHelperAuthSettingsProductAccessToken').hide();
+                $(manualTokenFieldElem).hide();
+                $(manualTokenLabelElem).show();
+                $(manualTokenRadioElem).prop('checked', false);
+            });
+
+        }
+        
+        const manualProductIdRadioElem = $(thisElem).find('.apiHelperManualProductId');
+        const manualProductIdLabelElem = $(thisElem).find('.apiHelperManualProductIdLabel');
+        const sandboxProductIdRadioElem = $(thisElem).find('.apiHelperSandboxProductIdRadio');
+        const productFieldElem = $(thisElem).find('.apiHelperAuthSettingsProduct');
+        const productSelectElem = $(thisElem).find('.apiHelperSandboxProductIdSelect');
+        
+        if ($(manualProductIdRadioElem).on('click', function() {
+            $(sandboxProductIdRadioElem).prop('checked', false);
+            $(manualProductIdLabelElem).hide();
+            $(productFieldElem).show();
+        }));
+        if ($(manualProductIdLabelElem).on('click', function() {
+            $(manualProductIdRadioElem).prop('checked', true);
+            $(sandboxProductIdRadioElem).prop('checked', false);
+            $(manualProductIdLabelElem).hide();
+            $(productFieldElem).show();
+        }));
+
+        if ($(sandboxProductIdRadioElem).on('click', function() {
+            $(manualProductIdRadioElem).prop('checked', false);
+            $(manualProductIdLabelElem).show();
+            $(productFieldElem).hide();
+        }));
+        if ($(productSelectElem).on('click', function() {
+            $(sandboxProductIdRadioElem).prop('checked', true);
+            $(manualProductIdRadioElem).prop('checked', false);
+            $(manualProductIdLabelElem).show();
+            $(productFieldElem).hide();
+        }));
+
+        if (productSelectElem.length) {
+            apiHelper.getProducts().then(function (productsData) {
+
+                productsData.products.sort(function (a, b) {
+                    return a.name.localeCompare(b.name);
+                });
+    
+                if (productsData.products.length > 0) {
+                    let html = '';
+                    for (let product of productsData.products) {
+                        html += '<option value="' + product.id + '">' + product.name + ' (' + product.id + ')</option>';
+                    }
+                    $(productSelectElem).html(html);
+                }
+                else {
+                    //setStatus('You do not have any products in your sandbox');
+                    //$(thisElem).find('.apiHelperActionButton').prop('disabled', true);
+                }
+            });
+        }
+
+
+
+    };
+
     const readCommonOptions = function(thisElem) {
         let result = {};
 
@@ -211,11 +296,25 @@ $(document).ready(function () {
             result.deviceId = $(thisElem).find('.apiHelperCloudDeviceSelect').val();
         }
 
-        if ($(thisElem).find('.apiHelperDeviceLookupDeviceId').length) {
-            result.productId = $(thisElem).find('.apiHelperAuthSettingsProduct').val();
+        const sandboxProductIdRadioElem = $(thisElem).find('.apiHelperSandboxProductIdRadio');
+        const productSelectElem = $(thisElem).find('.apiHelperSandboxProductIdSelect');
+        if ($(sandboxProductIdRadioElem).length && $(sandboxProductIdRadioElem).prop('checked')) {
+            result.productId = $(productSelectElem).val();
         }
-        if ($(thisElem).find('.apiHelperAuthSettingsProductAccessToken').length) {
-            result.accessToken = $(thisElem).find('.apiHelperAuthSettingsProductAccessToken').val();
+        else {
+            if ($(thisElem).find('.apiHelperDeviceLookupDeviceId').length) {
+                result.productId = $(thisElem).find('.apiHelperAuthSettingsProduct').val();
+            }    
+        }
+
+        const manualTokenLabelElem = $(thisElem).find('.apiHelperManualLabel');
+        if ($(manualTokenLabelElem).length && $(manualTokenLabelElem).prop('checked')) {
+            result.accessToken = apiHelper.auth.access_token;
+        }
+        else {
+            if ($(thisElem).find('.apiHelperAuthSettingsProductAccessToken').length) {
+                result.accessToken = $(thisElem).find('.apiHelperAuthSettingsProductAccessToken').val();
+            }    
         }
         if ($(thisElem).find('.apiHelperAuthSettingsCustomerAccessToken').length) {
             result.accessToken = $(thisElem).find('.apiHelperAuthSettingsCustomerAccessToken').val();
@@ -275,6 +374,8 @@ $(document).ready(function () {
         const setStatus = function (status) {
             $(thisElem).find('.apiHelperStatus').html(status);
         };
+
+        setupCommonOptions(thisElem);
 
         $(thisElem).find('.apiHelperGetVariable').on('click', function () {
             setStatus('Requesting variable...');
@@ -340,6 +441,8 @@ $(document).ready(function () {
         const setStatus = function (status) {
             $(thisElem).find('.apiHelperStatus').html(status);
         };
+
+        setupCommonOptions(thisElem);
 
         $(thisElem).find('.apiHelperCallFunction').on('click', function () {
             setStatus('Calling function...');
@@ -420,6 +523,8 @@ $(document).ready(function () {
         const setStatus = function (status) {
             $(thisElem).find('.apiHelperStatus').html(status);
         };
+
+        setupCommonOptions(thisElem);
 
         $(thisElem).find('.apiHelperActionButton').on('click', function () {
             setStatus('Publishing event...');
